@@ -1,0 +1,31 @@
+version: 0.2
+
+env:
+  
+  parameter-store:
+      Docker_username: /python_app/credential/username
+      Docker_passwd: /python_app/credential/password
+      Docker_url: /python_app/credential/url
+ 
+
+phases:
+  install:
+    runtime-versions:
+       python: 3.11
+     
+  pre_build:
+    commands:
+       - echo "Installing Dependencies"
+       - pip install -r requirements.txt
+  build:
+    commands:
+       - echo "Running Tests"
+       - echo "Building Docker Image"
+       - echo "$Docker_passwd" | docker login -u "$Docker_username" --password-stdin "$Docker_url"
+       - docker build -t "$Docker_url/$Docker_username/demo-python-app:latest" .
+       - docker push "$Docker_url/$Docker_username/demo-python-app:latest"
+      # - command
+  post_build:
+    commands:
+       - echo "Building Successful"
+     
